@@ -1,1 +1,1 @@
-# Exerc-cios-SOI
+# Exercicios-SOI
