@@ -4,8 +4,8 @@
 	privado)
 	2) O segundo, chamado ip, que verifica o Sistema Operacional e, de acordo com o S.O., faz a
 	chamada de configuração de IP.
-	A leitura do processo chamado deve verificar cada linha e, imprimir, apenas, o nome do
-	adaptador de rede e o IPv4, portanto, adaptadores sem IPv4 não devem ser mostrados
+	 A leitura do processo chamado deve verificar cada linha e, imprimir, apenas, o nome do
+     adaptador de rede e o IPv4, portanto, adaptadores sem IPv4 não devem ser mostrados
 	
 	
 	3) O terceiro, chamado ping, que verifica o Sistema Operacional e, de acordo com o S.O. e, faz a
@@ -22,6 +22,7 @@
 	3) Processo de chamada de configuração de IP:
 	Windows: IPCONFIG
 	Linux: ifconfig ou ip addr
+	
 	4) Processo de chamada de PING com 10 iterações, em IPv4 para www.google.com.br
 	Windows: ping -4 -n 10 www.google.com.br
 	Linux: ping -4 -c 10 www.google.com.br
@@ -31,17 +32,19 @@ package controller;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 
 public class RedesController{
+
 	public RedesController () {
     	super();
     	}
 	
 	//Primeiro método
 	public void os(){
-		System.out.println("1° Método:");
+		System.out.println("\n\n******************** 1° Método ********************\n");
 		String os = System.getProperty("os.name");
 		String ver = System.getProperty("os.version");
 		String arch = System.getProperty("os.arch");
@@ -53,12 +56,14 @@ public class RedesController{
 	//Segundo método
 	public void ip() throws IOException {
 		String os = System.getProperty("os.name");
-		System.out.println("2° Método:");
-		System.out.println(os);
+		System.out.println("\n\n******************** 2° Método ********************\n");
+		String nameOs = os;
+		System.out.println(nameOs);
+        int resultado = 0;
 		
-		
-			
-	        Process processo = Runtime.getRuntime().exec("ipconfig");
+		//validando SO
+        if (os.contains("Win")) {
+            Process processo = Runtime.getRuntime().exec("ipconfig");
 
 	        BufferedReader leitor = new BufferedReader(new InputStreamReader(processo.getInputStream()));
 	        String linha;
@@ -67,29 +72,68 @@ public class RedesController{
 	            System.out.println(linha);
 	        }
 
-	        int resultado = 0;
+	        //int resultado = 0;
+			try {
+				resultado = processo.waitFor();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}	
+        
+	        System.out.println("Código de saída: " + resultado+"\n\n");
+        
+        	
+        } else {
+            
+	        Process processo = Runtime.getRuntime().exec("ifconfig");
+
+	        BufferedReader leitor = new BufferedReader(new InputStreamReader(processo.getInputStream()));
+	        String linha;
+
+	        while ((linha = leitor.readLine()) != null) {
+	            System.out.println(linha);
+	        }
+
+	        //int resultado = 0;
 			try {
 				resultado = processo.waitFor();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-	        System.out.println("Código de saída: " + resultado+"\n\n");
-		
+	        //System.out.println("Código de saída: " + resultado+"\n\n");
+        }
+        
+        System.out.println("Código de saída: " + resultado+"\n\n");
+        
 	}
-	
+        
+       
 
 	
 	
 	//Terceiro método
 	public void ping() throws IOException {
-		String os = System.getProperty("os.name");
-		System.out.println("3° Método:");
-		System.out.println(os);
+		System.out.println("\n\n******************** 3° Método ********************\n");
+
+		        String host = "-4 -n 10 www.google.com.br";
+				String command = "ping " + host;
+
+		        try {
+		            Process process = new ProcessBuilder(command.split(" ")).start();
+		            InputStream inputStream = process.getInputStream();
+		            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+		            String line;
+		            while ((line = reader.readLine()) != null) {
+		                System.out.println(line);
+		            }
+		            int exitCode = process.waitFor();
+		            System.out.println("Comando de ping concluído com código de saída: " + exitCode);
+
+		        } catch (IOException | InterruptedException e) {
+		            e.printStackTrace();
+		        }
+		}
+}
 	
-		
-		
-	}
 	
 
-	
-}
